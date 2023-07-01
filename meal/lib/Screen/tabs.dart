@@ -4,18 +4,11 @@ import 'package:meal/Screen/categoryes.dart';
 import 'package:meal/Screen/filters.dart';
 import 'package:meal/Screen/meals.dart';
 // import 'package:meal/data/dummy_data.dart';
-import 'package:meal/models/meal.dart';
-import 'package:meal/widget/main_drawer.dart';
-import 'package:meal/providers/meals.proveder.dart';
-import 'package:meal/providers/favMealProvider.dart';
 
-const KInitialFilters = {
-  //used for globalisation
-  Filter.glutenFree: false,
-  Filter.lactoseFree: false,
-  Filter.vegan: false,
-  Filter.vegiterian: false
-};
+import 'package:meal/widget/main_drawer.dart';
+
+import 'package:meal/providers/favMealProvider.dart';
+import 'package:meal/providers/filter_provider.dart';
 
 class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key});
@@ -28,7 +21,7 @@ class TabsScreen extends ConsumerStatefulWidget {
 class _TabsScreenState extends ConsumerState<TabsScreen> {
   int _selectedPageIndex = 0;
   // final List<Meal> _favarotieMeal = [];
-  Map<Filter, bool> _selectedFilter = KInitialFilters;
+  // Map<Filter, bool> _selectedFilter = KInitialFilters;
 
   // void _toggleMealFAveritesSatus(Meal meal) {
   //   final isExisting = _favarotieMeal.contains(meal);
@@ -52,14 +45,9 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
   void _setScreen(String identifier) async {
     if (identifier == 'filters') {
       Navigator.of(context).pop();
-      final result =
-          await Navigator.of(context).push<Map<Filter, bool>>(MaterialPageRoute(
-              builder: (ctx) => FilterScreen(
-                    currentFilters: _selectedFilter,
-                  )));
-      setState(() {
-        _selectedFilter = result ?? KInitialFilters;
-      });
+
+      await Navigator.of(context).push<Map<Filter, bool>>(
+          MaterialPageRoute(builder: (ctx) => FilterScreen()));
     } else {
       Navigator.of(context).pop();
     }
@@ -67,24 +55,9 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final meal = ref.watch(mealProviders); /////////
-    final avilableMeal = meal.where((meal) {
-      if (_selectedFilter[Filter.glutenFree]! && !meal.isGlutenFree) {
-        return false;
-      }
-      if (_selectedFilter[Filter.lactoseFree]! && !meal.isLactoseFree) {
-        return false;
-      }
-      if (_selectedFilter[Filter.vegan]! && !meal.isVegan) {
-        return false;
-      }
-      if (_selectedFilter[Filter.vegiterian]! && !meal.isVegetarian) {
-        return false;
-      }
-      return true;
-    }).toList();
+    final avilableMeals = ref.watch(filteredMealsProvider);
     Widget activePage = CartegoryScreen(
-      avilableMeals: avilableMeal,
+      avilableMeals: avilableMeals,
     );
     var activePageTitle = 'Categories';
     if (_selectedPageIndex == 1) {
