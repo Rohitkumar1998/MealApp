@@ -31,17 +31,29 @@ class MealDetailsScreen extends ConsumerWidget {
                         ? 'Meal added as favorites.'
                         : 'Meal remoed')));
               },
-              icon: Icon(containMeal ? Icons.star : Icons.star_border))
+              icon: AnimatedSwitcher(
+                  duration: Duration(seconds: 1),
+                  transitionBuilder: (child, animation) {
+                    return RotationTransition(
+                      turns: Tween(begin: 0.9, end: 1.0).animate(animation),
+                      child: child,
+                    );
+                  },
+                  child: Icon(containMeal ? Icons.star : Icons.star_border,
+                      key: ValueKey(containMeal))))
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Image.network(
-              meal.imageUrl,
-              width: double.infinity,
-              height: 300,
-              fit: BoxFit.cover,
+            Hero(
+              tag: meal.id,
+              child: Image.network(
+                meal.imageUrl,
+                width: double.infinity,
+                height: 300,
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(
               height: 14,
